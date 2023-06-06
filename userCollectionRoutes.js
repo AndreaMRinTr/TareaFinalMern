@@ -13,7 +13,7 @@ module.exports = function (app) {
     app.route('/usuarios/autenticar/:correo/:contrasena')
         .get(userCollection.autenticarUsuario);
 
-    app.route('/eventos/:user')
+    app.route('/event/:user')
         .get(userCollection.obtener_eventos_por_usuario)
     
     app.route('/eventos/:username/:evento')
@@ -30,6 +30,16 @@ module.exports = function (app) {
 
     app.route('/eventos/fechas/:fechaInicio/:fechaFin')
         .get(userCollection.obtener_eventos_por_rango_fechas);
+
+    app.route('/vid/agregara/:username')
+        .post(userCollection.guardar_registro_videojuego);
+
+    app.route('/eventos/agregara/:username')
+        .post(userCollection.guardar_evento_log);
+     
+
+
+      
 
 
         
