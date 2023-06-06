@@ -41,22 +41,23 @@ exports.obtener_usuario_por_correo = async function (req, res) {
 };
 
 //Obtener todos los eventos del log que correspondan a un usuario en específico.
-//http://localhost:8585/eventos/usr_1
+//http://localhost:8586/event/usr_3
 exports.obtener_eventos_por_usuario = async function (req, res) {
-    // Nos conectamos a la BD
-    const database = client.db(dbName);
-    // Referencia a la colección
-    const eventos = database.collection("logs");
-    // Obtenemos el valor del parámetro (identificador de usuario)
-    const usuarioId = req.params.usuarioId;
-    // Declaramos los filtros
-    const query = { username: new RegExp(usuarioId, 'i') };
-    // Hacemos la consulta
-    const cursor = eventos.find(query);
-    const eventosUsuario = await cursor.toArray();
-    console.log("Eventos obtenidos:", eventosUsuario);
-    res.json(eventosUsuario);
-  };
+  // Nos conectamos a la BD
+  const database = client.db(dbName);
+  // Referencia a la colección
+  const eventos = database.collection("logs");
+  // Obtenemos el valor del parámetro (identificador de usuario)
+  const username = req.params.user;
+  // Construimos el filtro para el usuario
+  const filtroUsuario = { username: new RegExp(username, 'i') };
+  // Hacemos la consulta
+  const eventosUsuario = await eventos.find(filtroUsuario).toArray();
+  console.log("Eventos obtenidos:", eventosUsuario);
+  res.json(eventosUsuario);
+};
+
+
 
 //Obtener todos los eventos del log que correspondan a un usuario en específico y que el evento contenga
 //las palabras de búsqueda indicadas.
@@ -214,11 +215,6 @@ exports.autenticarUsuario = async function (req, res) {
   }
 };
 
-
-// Guardar toda la información de un registro de videojuego para la colección de un usuario en esepecífico.
-
-//Guardar un evento de log en base de datos.
-
 //Obtener todos los eventos del log que correspondan a un rango de fechas en específico. --buscar error
 exports.obtener_eventos_por_rango_fechas = async function (req, res) {
     // Nos conectamos a la BD
@@ -245,6 +241,83 @@ exports.obtener_eventos_por_rango_fechas = async function (req, res) {
     res.json(eventosPorRangoFechas);
 };
 
+// Guardar toda la información de un registro de videojuego para la colección de un usuario en esepecífico.
+//http://localhost:8586/vid/agregara/usr_3
+
+//body
+/*{
+  "juegoId": "3498",
+  "nombreJuego": "Grand Theft Auto V",
+  "plataforma": [
+    "PlayStation 5",
+    "Xbox Series S/X",
+    "PlayStation 4",
+    "PC",
+    "PlayStation 3",
+    "Xbox 360",
+    "Xbox One"
+  ]
+}*/
+
+exports.guardar_registro_videojuego = async function (req, res) {
+  // Conectarse a la base de datos
+  const database = client.db(dbName);
+  
+  // Obtener el nombre de usuario y los datos del videojuego del cuerpo de la solicitud
+  const username = req.params.username;
+  const videojuego = req.body;
+  
+  // Referencia a la colección de videojuegos
+  const videojuegos = database.collection("videojuegos");
+
+  // Establecer el campo "username" en los datos del videojuego
+  videojuego.username = username;
+
+  // Guardar el registro de videojuego en la colección de videojuegos
+  const result = await videojuegos.insertOne(videojuego);
+  
+  res.json({ message: "Registro de videojuego guardado correctamente" });
+  console.log(result);
+};
+
+//Guardar un evento de log en base de datos.
+//http://localhost:8586/eventos/agregara/usr_3
+
+//body
+
+/*{
+  "evento": "Agregó el juego Grand Theft Auto V a su colección"
+}
+*/
+
+exports.guardar_evento_log = async function (req, res) {
+  // Conectarse a la base de datos
+  const database = client.db(dbName);
+  
+  // Obtener el username del parámetro de la ruta
+  const username = req.params.username;
+  
+  // Obtener el evento del cuerpo de la solicitud
+  const evento = req.body.evento;
+  
+  // Referencia a la colección de logs
+  const logs = database.collection("logs");
+
+  const fechaEvento = new Date();
+
+  // Crear un objeto que represente el evento de log
+  const eventoLog = {
+    username: username,
+    evento: evento,
+    fechaEvento: fechaEvento
+  };
+  // Guardar el evento de log en la colección de logs
+  const result = await logs.insertOne(eventoLog);
+  
+  // Manejar la respuesta y enviar una confirmación al cliente
+  res.json({ message: "Evento de log guardado correctamente" });
+  console.log(result);
+};
 
 
 
