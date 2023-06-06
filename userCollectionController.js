@@ -258,7 +258,7 @@ exports.obtener_eventos_por_rango_fechas = async function (req, res) {
     "Xbox One"
   ]
 }*/
-
+/*
 exports.guardar_registro_videojuego = async function (req, res) {
   // Conectarse a la base de datos
   const database = client.db(dbName);
@@ -279,6 +279,55 @@ exports.guardar_registro_videojuego = async function (req, res) {
   res.json({ message: "Registro de videojuego guardado correctamente" });
   console.log(result);
 };
+
+body de función opcion 2 
+{
+  "juegoId": "3498",
+  "nombreJuego": "Grand Theft Auto V",
+  "plataforma": [
+    "PlayStation 5",
+    "Xbox Series S/X",
+    "PlayStation 4",
+    "PC",
+    "PlayStation 3",
+    "Xbox 360",
+    "Xbox One"
+  ],
+  "comentarios": "Lo amo!"
+}
+*/
+
+exports.guardar_registro_videojuego = async function (req, res) {
+  try {
+    // Conectarse a la base de datos
+    const database = client.db(dbName);
+    
+    // Obtener los valores de los parámetros (nombre de usuario y datos del videojuego)
+    const username = req.params.username;
+    const videojuego = req.body;
+    
+    // Referencia a la colección de videojuegos
+    const videojuegos = database.collection("videojuegos");
+    
+    // Construir el objeto con la información del registro de videojuego
+    const registroVideojuego = {
+      username: username,
+      juegoId: videojuego.juegoId,
+      nombreJuego: videojuego.nombreJuego,
+      plataforma: videojuego.plataforma,
+      comentarios: videojuego.comentarios
+    };
+    
+    // Guardar el registro de videojuego en la colección de videojuegos
+    await videojuegos.insertOne(registroVideojuego);
+    
+    res.json({ message: "Registro de videojuego guardado correctamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al guardar el registro de videojuego" });
+  }
+};
+
 
 //Guardar un evento de log en base de datos.
 //http://localhost:8586/eventos/agregara/usr_3
